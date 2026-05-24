@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "O-LiP — AI Code Security Review",
+  "version": "1.0.1",
+  "description": "AI-powered security vulnerability detection for GitHub PRs. Supports Google Gemini (free) and Anthropic Claude.",
+  "permissions": ["activeTab", "storage", "scripting"],
+  "host_permissions": [
+    "https://github.com/*",
+    "https://api.groq.com/*",
+    "https://generativelanguage.googleapis.com/*",
+    "https://api.anthropic.com/*"
+  ],
+  "background": { "service_worker": "background/service-worker.js" },
+  "content_scripts": [
+    {
+      "matches": ["https://github.com/*"],
+      "js": ["content/content.js"],
+      "css": ["content/content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "O-LiP",
+    "default_icon": { "16": "icons/icon16.png", "48": "icons/icon48.png", "128": "icons/icon128.png" }
+  },
+  "icons": { "16": "icons/icon16.png", "48": "icons/icon48.png", "128": "icons/icon128.png" }
+}

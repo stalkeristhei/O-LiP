@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>O-LiP Settings</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg:#08080e; --surface:#111118; --border:rgba(255,255,255,0.07); --accent:#ff5020; --text:#f0f0f8; --text-muted:rgba(255,255,255,0.4); --green:#50c878; --red:#ff5050; }
+    body { width: 340px; background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; }
+
+    .header { background: linear-gradient(135deg,rgba(255,80,30,0.14),rgba(255,30,10,0.06)); border-bottom:1px solid var(--border); padding:16px 18px 14px; display:flex; align-items:center; gap:12px; }
+    .logo-icon { width:36px;height:36px;background:linear-gradient(135deg,#ff5020,#cc1800);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 4px 14px rgba(255,60,20,0.4);flex-shrink:0; }
+    .logo-title { font-size:16px;font-weight:800; } .logo-title span { color:var(--accent); }
+    .logo-sub { font-size:10px;color:var(--text-muted);margin-top:1px; }
+    .logo-version { font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(255,80,30,0.6);background:rgba(255,80,30,0.1);padding:1px 6px;border-radius:10px;margin-top:2px;display:inline-block; }
+
+    .body { padding:18px; display:flex; flex-direction:column; gap:14px; }
+    .section-label { font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px; }
+
+    .provider-tabs { display:flex; gap:5px; }
+    .provider-tab { flex:1;font-family:'Syne',sans-serif;font-size:10px;font-weight:700;padding:8px 4px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text-muted);cursor:pointer;text-align:center;transition:all .2s;line-height:1.5; }
+    .provider-tab.active-groq      { background:rgba(249,115,22,0.15); color:#fb923c; border-color:rgba(249,115,22,0.35); }
+    .provider-tab.active-gemini    { background:rgba(66,133,244,0.15);  color:#6ab0ff; border-color:rgba(66,133,244,0.35); }
+    .provider-tab.active-anthropic { background:rgba(255,80,30,0.15);   color:#ff7050; border-color:rgba(255,80,30,0.3); }
+
+    .free-badge { display:inline-block;font-size:8px;font-weight:700;background:rgba(80,200,120,0.2);color:#50c878;border:1px solid rgba(80,200,120,0.3);border-radius:4px;padding:1px 4px; }
+
+    .input-wrap { position:relative; }
+    input[type="password"], input[type="text"] { width:100%;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 40px 10px 13px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text);outline:none;transition:border-color .2s; }
+    input:focus { border-color:rgba(255,80,30,0.4); } input::placeholder { color:var(--text-muted); }
+    .input-toggle { position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;padding:2px; }
+
+    .info-box { border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:5px; }
+    .info-box.groq     { background:rgba(249,115,22,0.06); border:1px solid rgba(249,115,22,0.2); }
+    .info-box.gemini   { background:rgba(66,133,244,0.06); border:1px solid rgba(66,133,244,0.15); }
+    .info-box.anthropic{ background:rgba(255,80,30,0.06);  border:1px solid rgba(255,80,30,0.15); }
+    .step { font-size:10px;color:rgba(255,255,255,0.55);line-height:1.5; }
+    .step a { color:#fb923c; text-decoration:none; } .step a:hover { text-decoration:underline; }
+    .step.success { color:#50c878; }
+
+    .toggle-row { display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 13px; }
+    .toggle-info { flex:1; } .toggle-label { font-size:12px;font-weight:600; } .toggle-desc { font-size:10px;color:var(--text-muted);margin-top:1px; }
+    .toggle { position:relative;width:36px;height:20px;flex-shrink:0; } .toggle input { opacity:0;width:0;height:0; }
+    .toggle-track { position:absolute;inset:0;background:rgba(255,255,255,0.1);border-radius:20px;cursor:pointer;transition:background .2s; }
+    .toggle input:checked + .toggle-track { background:var(--accent); }
+    .toggle-track::after { content:'';position:absolute;left:3px;top:3px;width:14px;height:14px;border-radius:50%;background:#fff;transition:transform .2s; }
+    .toggle input:checked + .toggle-track::after { transform:translateX(16px); }
+
+    .sev-pills { display:flex;gap:5px; }
+    .sev-pill { flex:1;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;text-align:center;padding:6px 2px;border-radius:7px;cursor:pointer;border:1px solid var(--border);transition:all .15s;color:var(--text-muted);background:var(--surface); }
+    .sev-pill.active-critical{background:rgba(255,50,50,.18);color:#ff6060;border-color:rgba(255,50,50,.3);}
+    .sev-pill.active-high{background:rgba(255,140,0,.18);color:#ffaa30;border-color:rgba(255,140,0,.3);}
+    .sev-pill.active-medium{background:rgba(255,200,0,.18);color:#ffd040;border-color:rgba(255,200,0,.3);}
+    .sev-pill.active-low{background:rgba(80,200,120,.15);color:#60cc80;border-color:rgba(80,200,120,.25);}
+
+    .btn-primary { width:100%;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;background:linear-gradient(135deg,#ff5020,#cc1800);color:#fff;border:none;border-radius:9px;padding:11px;cursor:pointer;transition:opacity .2s,transform .1s;box-shadow:0 4px 16px rgba(255,60,20,.3); }
+    .btn-primary:hover{opacity:.88;} .btn-primary:active{transform:scale(.98);}
+
+    .status-bar{display:none;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 13px;font-size:11px;}
+    .status-bar.show{display:flex;} .status-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+    .status-bar.success .status-dot{background:var(--green);} .status-bar.error .status-dot{background:var(--red);}
+    .status-bar.success .status-text{color:var(--green);} .status-bar.error .status-text{color:var(--red);}
+
+    .divider{height:1px;background:var(--border);margin:0 -18px;}
+    .footer{padding:10px 18px;display:flex;align-items:center;justify-content:space-between;}
+    .footer-link{font-size:10px;color:var(--text-muted);text-decoration:none;transition:color .2s;} .footer-link:hover{color:#fb923c;}
+    .footer-version{font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(255,255,255,0.15);}
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo-icon">🛡</div>
+    <div>
+      <div class="logo-title">O-<span>LiP</span></div>
+      <div class="logo-sub">AI Code Security Review</div>
+      <div class="logo-version">v1.0.1</div>
+    </div>
+  </div>
+
+  <div class="body">
+    <div>
+      <div class="section-label">AI Provider</div>
+      <div class="provider-tabs">
+        <div class="provider-tab active-groq" data-provider="groq">⚡ Groq<br><span class="free-badge">FREE</span></div>
+        <div class="provider-tab" data-provider="gemini">🔵 Gemini<br><span style="font-size:9px;opacity:.6">Google</span></div>
+        <div class="provider-tab" data-provider="anthropic">🟠 Claude<br><span style="font-size:9px;opacity:.6">Paid</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label" id="key-label">Groq API Key</div>
+      <div class="input-wrap">
+        <input type="password" id="api-key-input" placeholder="gsk_..." autocomplete="off" />
+        <button class="input-toggle" id="toggle-visibility">👁</button>
+      </div>
+    </div>
+
+    <div class="info-box groq" id="info-box">
+      <div class="step">1. Go to <a href="https://console.groq.com/keys" target="_blank">console.groq.com/keys</a></div>
+      <div class="step">2. Sign up free → click <strong>"Create API Key"</strong></div>
+      <div class="step">3. Copy the key (starts with <strong>gsk_</strong>) and paste above</div>
+      <div class="step success">✓ Completely free — no credit card, no billing</div>
+    </div>
+
+    <div>
+      <div class="section-label">Behavior</div>
+      <div class="toggle-row">
+        <div class="toggle-info"><div class="toggle-label">Auto-scan on PR load</div><div class="toggle-desc">Scan automatically when you open a PR diff</div></div>
+        <label class="toggle"><input type="checkbox" id="auto-scan" checked /><div class="toggle-track"></div></label>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">Minimum severity to flag</div>
+      <div class="sev-pills">
+        <div class="sev-pill" data-sev="critical">CRIT</div>
+        <div class="sev-pill active-high" data-sev="high">HIGH</div>
+        <div class="sev-pill" data-sev="medium">MED</div>
+        <div class="sev-pill" data-sev="low">LOW</div>
+      </div>
+    </div>
+
+    <div class="status-bar" id="status-bar"><div class="status-dot"></div><span class="status-text" id="status-text"></span></div>
+    <button class="btn-primary" id="save-btn">Save Settings</button>
+  </div>
+
+  <div class="divider"></div>
+  <div class="footer">
+    <a href="https://console.groq.com/keys" target="_blank" class="footer-link" id="console-link">Get Free API Key →</a>
+    <span class="footer-version">v1.0.1</span>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
