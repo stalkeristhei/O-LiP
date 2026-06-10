@@ -66,6 +66,14 @@ Content Script
   ↓ renders panel with score, categories, findings
 ```
 
+## Limitations
+
+- Analysis quality depends on the quality and size of the PR diff.
+- Very large pull requests may be truncated by the AI model.
+- Findings should be reviewed by a developer before applying fixes.
+- O-LiP is designed to assist code reviews and should not replace manual security testing.
+
+
 ## Privacy
 
 - Your API key is stored locally in Chrome's extension storage (`chrome.storage.sync`)
